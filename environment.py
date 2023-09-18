@@ -31,9 +31,9 @@ class Environment:
             self.screen = pygame.display.set_mode((self.WIDTH*self.SCALE, self.HEIGHT*self.SCALE))
             pygame.display.set_caption("Hide and Seek")
 
-    def step(self, ag, action):
-
-        self.agents[ag].move(action)
+    def step(self, action, player):
+        done = False
+        self.agents[player].move(action)
         
         if self.render:
             # Clear the screen
@@ -54,6 +54,26 @@ class Environment:
 
             # Limit the frame rate to the target FPS
             self.clock.tick(5)
+        
+        if self.agents[0].x==self.agents[1].x and self.agents[0].y==self.agents[1].y:
+            done = True
+
+        reward = self.distance_inverse()
+
+        if player == 0:
+            reward = -reward
+
+        state = [self.hider.x,self.hider.y,self.seeker.x,self.seeker.y]
+
+        print([player, state, reward, done])
+        return state, reward, done
+    
+    def distance_inverse(self):
+        return 1/max((((self.hider.x-self.seeker.x)**2+(self.hider.y-self.seeker.y)**2)**0.5),0.1)
+
+    def reset(self):
+        self.seeker.set_position(0,0)
+        self.hider.set_position(9,9)
 
     def quit(self):
         # Quit Pygame

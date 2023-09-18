@@ -29,3 +29,7 @@ class Agent:
         elif direction == 3:
             if self.x != 0:
                 self.x-=1
+    
+    def set_position(self, x, y):
+        self.x = x
+        self.y = y
