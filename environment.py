@@ -1,6 +1,7 @@
 import pygame
 import sys
 from agent import Agent
+import random
 
 class Environment:
     #TODO have map to all positions of agents so we can check if an agent colliides when it enters a square instead of comapring the positions of all agents
@@ -17,8 +18,10 @@ class Environment:
         self.HIDER_COLOR = (0,255,0)        # Green
 
         # Variables
+        
         self.hider = Agent(9,9,"hider",self)
         self.seeker = Agent(0,0,"seeker",self)
+        self.reset()
 
         self.agents = [self.hider, self.seeker]
 
@@ -65,15 +68,26 @@ class Environment:
 
         state = [self.hider.x,self.hider.y,self.seeker.x,self.seeker.y]
 
-        print([player, state, reward, done])
         return state, reward, done
     
     def distance_inverse(self):
         return 1/max((((self.hider.x-self.seeker.x)**2+(self.hider.y-self.seeker.y)**2)**0.5),0.1)
 
     def reset(self):
-        self.seeker.set_position(0,0)
-        self.hider.set_position(9,9)
+        # Create a list of all possible coordinates in the range 0 to 9
+        all_coordinates = [(x, y) for x in range(10) for y in range(10)]
+
+        # Shuffle the list of all coordinates randomly
+        random.shuffle(all_coordinates)
+
+        # Take the first two sets of coordinates from the shuffled list
+        set1 = all_coordinates.pop()
+        set2 = all_coordinates.pop()
+
+        self.seeker.set_position(set1[0],set1[1])
+        self.hider.set_position(set2[0],set2[1])
+
+        return [self.hider.x,self.hider.y,self.seeker.x,self.seeker.y]
 
     def quit(self):
         # Quit Pygame
